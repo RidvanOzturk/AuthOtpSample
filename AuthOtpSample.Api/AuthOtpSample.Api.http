@@ -1,0 +1,6 @@
+@AuthOtpSample.Api_HostAddress = http://localhost:5213
+
+GET {{AuthOtpSample.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
