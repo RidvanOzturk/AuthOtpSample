@@ -1,6 +1,7 @@
 using AuthOtpSample.Application.Abstractions.Persistence;
 using AuthOtpSample.Application.Abstractions.Security;
 using AuthOtpSample.Application.Features.Auth.Login;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Application.Services;
 
@@ -11,13 +12,22 @@ public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher h
     {
         var user = await appDbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Email == command.Email, cancellationToken);
 
-        if (user is null) throw new UnauthorizedAccessException("Invalid credentials");
-        if (!user.IsActive) throw new UnauthorizedAccessException("Account is not active");
+        if (user is null)
+        {
+            throw new UnauthorizedAccessException("Invalid credentials");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new UnauthorizedAccessException("Account is not active");
+        }
 
         if (!hasher.Verify(command.Password, user.HashPassword))
+        {
             throw new UnauthorizedAccessException("Invalid credentials");
+        }
 
         return tokens.CreateToken(user.Id, user.Email);
     }

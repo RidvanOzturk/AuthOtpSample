@@ -6,9 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Infrastructure.Database;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser)
-    : DbContext(options), IAppDbContext
+public sealed class ApplicationDbContext : DbContext, IAppDbContext
 {
+    private readonly ICurrentUser _currentUser;
+
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser)
+        : base(options)
+    {
+        _currentUser = currentUser;
+    }
+
     public DbSet<User> Users => Set<User>();
     public DbSet<Otp> Otps => Set<Otp>();
     public DbSet<Notification> Notifications => Set<Notification>();
@@ -64,7 +71,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     private void ApplyAuditAndSoftDelete()
     {
         var now = DateTime.UtcNow;
-        var actor = string.IsNullOrWhiteSpace(currentUser.UserId.ToString()) ? "system" : currentUser.UserId.ToString();
+        var actor = string.IsNullOrWhiteSpace(_currentUser.UserId.ToString()) ? "system" : _currentUser.UserId.ToString();
 
         foreach (var entry in ChangeTracker.Entries<AbstractAuditEntity>())
         {
