@@ -1,0 +1,24 @@
+using AuthOtpSample.Application.Abstractions.Persistence;
+using AuthOtpSample.Application.Abstractions.Security;
+using AuthOtpSample.Application.Features.Auth.Login;
+
+namespace AuthOtpSample.Application.Services;
+
+public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher hasher, ITokenService tokens)
+    : IAuthenticationService
+{
+    public async Task<string> LoginAsync(LoginCommand command, CancellationToken cancellationToken)
+    {
+        var user = await appDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
+
+        if (user is null) throw new UnauthorizedAccessException("Invalid credentials");
+        if (!user.IsActive) throw new UnauthorizedAccessException("Account is not active");
+
+        if (!hasher.Verify(command.Password, user.HashPassword))
+            throw new UnauthorizedAccessException("Invalid credentials");
+
+        return tokens.CreateToken(user.Id, user.Email);
+    }
+}
