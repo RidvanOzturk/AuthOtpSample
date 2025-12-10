@@ -16,8 +16,9 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddServices(IConfiguration config)
         {
             services.AddHttpContextAccessor();
-            services.AddScoped<ICurrentUser, CurrentUserService>();
 
+            services.AddScoped<ICurrentUser, CurrentUserService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             var key = config["Jwt:Key"];

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuthOtpSample.Api.Controllers;
 
@@ -6,9 +7,10 @@ namespace AuthOtpSample.Api.Controllers;
 [ApiController]
 public class ProfileController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult GetProfile()
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me()
     {
-        return Ok();
+        return Ok(new { ok = true, user = User.Identity?.Name, claims = User.Claims.Select(c => new { c.Type, c.Value }) });
     }
 }

@@ -1,6 +1,8 @@
-﻿using AuthOtpSample.Application.Abstractions.Persistence;
+﻿using AuthOtpSample.Application.Abstractions.Notifications;
+using AuthOtpSample.Application.Abstractions.Persistence;
 using AuthOtpSample.Application.Abstractions.Security;
 using AuthOtpSample.Infrastructure.Database;
+using AuthOtpSample.Infrastructure.Notifications;
 using AuthOtpSample.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,7 @@ public static class ServiceCollectionExtensions
 
             services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
             services.AddScoped<ITokenService, JwtTokenService>();
+            services.AddScoped<IEmailSender, ConsoleEmailSender>();
 
             return services;
         }
