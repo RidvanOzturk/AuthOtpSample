@@ -7,11 +7,6 @@ namespace AuthOtpSample.Application.Services;
 
 public class ProfileService(IAppDbContext appDbContext, ICurrentUser currentUser) : IProfileService
 {
-    private int GetUserIdOrThrow()
-    {
-        return currentUser.UserId ?? throw new UnauthorizedAccessException("User not authenticated");
-    }
-
     public async Task<ProfileDto?> GetAsync(CancellationToken cancellationToken)
     {
         var userId = GetUserIdOrThrow();
@@ -61,5 +56,10 @@ public class ProfileService(IAppDbContext appDbContext, ICurrentUser currentUser
         user.DateOfBirth = null;
 
         await appDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private int GetUserIdOrThrow()
+    {
+        return currentUser.UserId ?? throw new UnauthorizedAccessException("User not authenticated");
     }
 }

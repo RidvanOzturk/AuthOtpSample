@@ -45,8 +45,6 @@ public class AccountService(
             ExpirationDate = DateTime.UtcNow.AddMinutes(10)
         });
 
-        // Default notification istersen burada da oluşturabilirsin (şimdilik sonra ekleriz)
-
         await appDbContext.SaveChangesAsync(cancellationToken);
 
         await emailSender.SendAsync(
@@ -90,7 +88,6 @@ public class AccountService(
             return;
         }
 
-        // Eski ForgotPassword otp'lerini isteğe göre soft-delete edebilirsin
         var oldOtps = await appDbContext.Otps
             .Where(o => o.UserId == user.Id && o.Type == OtpType.ForgotPassword)
             .ToListAsync(cancellationToken);
@@ -112,7 +109,6 @@ public class AccountService(
 
         await appDbContext.SaveChangesAsync(cancellationToken);
 
-        // Kullanıcının notification ayarlarına göre gönder
         var notification = await appDbContext.Notifications
             .AsNoTracking()
             .FirstOrDefaultAsync(n => n.UserId == user.Id, cancellationToken);
