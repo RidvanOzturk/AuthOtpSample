@@ -1,11 +1,9 @@
-﻿using System.Text;
-using AuthOtpSample.Api.Services;
+﻿using AuthOtpSample.Api.Services;
 using AuthOtpSample.Application.Abstractions.Common;
 using AuthOtpSample.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace AuthOtpSample.Api.Extensions;
 
@@ -20,6 +18,9 @@ public static class ServiceCollectionExtensions
             services.AddScoped<ICurrentUser, CurrentUserService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<INotificationService, NotificationService>();
+
 
             var key = config["Jwt:Key"];
             var issuer = config["Jwt:Issuer"];

@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
             services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<IEmailSender, ConsoleEmailSender>();
+            services.AddScoped<ISmsSender, ConsoleSmsSender>();
 
             return services;
         }

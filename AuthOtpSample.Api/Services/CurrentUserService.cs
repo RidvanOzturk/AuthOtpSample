@@ -1,18 +1,45 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using AuthOtpSample.Application.Abstractions.Common;
-using Microsoft.AspNetCore.Http;
 
 namespace AuthOtpSample.Api.Services;
 
 public sealed class CurrentUserService(IHttpContextAccessor accessor) : ICurrentUser
 {
-    private ClaimsPrincipal? Principal => accessor.HttpContext?.User;
+    private HttpContext? HttpContext => accessor.HttpContext;
 
-    public bool IsAuthenticated => Principal?.Identity?.IsAuthenticated ?? false;
+    public bool IsAuthenticated =>
+        HttpContext?.User?.Identity?.IsAuthenticated == true;
 
-    public int? UserId =>
-        int.TryParse(Principal?.FindFirstValue("userId"), out var id) ? id : (int?)null;
+    public int? UserId
+    {
+        get
+        {
+            var user = HttpContext?.User;
+            if (user?.Identity?.IsAuthenticated != true)
+                return null;
 
-    public string? Email =>
-        Principal?.FindFirstValue("email") ?? Principal?.FindFirstValue(ClaimTypes.Email);
+            var raw =
+                user.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            return int.TryParse(raw, out var id) ? id : (int?)null;
+        }
+    }
+
+    public string? Email
+    {
+        get
+        {
+            var user = HttpContext?.User;
+
+            if (user?.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
+            return user.FindFirstValue(ClaimTypes.Email) ??
+                   user.FindFirstValue(JwtRegisteredClaimNames.Email);
+        }
+    }
 }

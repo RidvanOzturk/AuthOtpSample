@@ -4,7 +4,7 @@ namespace AuthOtpSample.Infrastructure.Notifications;
 
 public class ConsoleEmailSender : IEmailSender
 {
-    public Task SendAsync(string toEmail, string subject, string body, CancellationToken ct)
+    public Task SendAsync(string toEmail, string subject, string body, CancellationToken cancellationToken)
     {
         Console.WriteLine($"[EMAIL] To={toEmail} Subject={subject} Body={body}");
         return Task.CompletedTask;
