@@ -1,6 +1,6 @@
-﻿using AuthOtpSample.Api.Contracts.Notifications;
-using AuthOtpSample.Application.Features.Notifications;
-using AuthOtpSample.Application.Services;
+﻿using AuthOtpSample.Api.Models.Request;
+using AuthOtpSample.Application.DTOs;
+using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ public class NotificationController(INotificationService notifications) : Contro
     [HttpPost("users")]
     public async Task<IActionResult> CreateForCurrentUser([FromBody] NotificationRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateNotificationCommand(
+        var cmd = new UpdateNotificationDto(
             request.IsEmailNotificationEnabled,
             request.IsSmsNotificationEnabled);
 
@@ -32,7 +32,7 @@ public class NotificationController(INotificationService notifications) : Contro
     [HttpPut("users")]
     public async Task<IActionResult> UpdateForCurrentUser([FromBody] NotificationRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateNotificationCommand(
+        var cmd = new UpdateNotificationDto(
             request.IsEmailNotificationEnabled,
             request.IsSmsNotificationEnabled);
 

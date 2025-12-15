@@ -1,9 +1,8 @@
 ﻿using AuthOtpSample.Application.Abstractions.Notifications;
-using AuthOtpSample.Application.Abstractions.Persistence;
 using AuthOtpSample.Application.Abstractions.Security;
 using AuthOtpSample.Infrastructure.Database;
 using AuthOtpSample.Infrastructure.Notifications;
-using AuthOtpSample.Infrastructure.Security;
+using AuthOtpSample.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,12 +18,10 @@ public static class ServiceCollectionExtensions
             services.AddDbContext<ApplicationDbContext>(opt =>
                 opt.UseSqlServer(config.GetConnectionString("SqlServer")));
 
-            services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
-
-            services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
             services.AddScoped<ITokenService, JwtTokenService>();
-            services.AddScoped<IEmailSender, ConsoleEmailSender>();
-            services.AddScoped<ISmsSender, ConsoleSmsSender>();
+            services.Configure<SmtpOptions>(config.GetSection("Smtp"));
+            services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<ISmsSender, SmsSender>();
 
             return services;
         }

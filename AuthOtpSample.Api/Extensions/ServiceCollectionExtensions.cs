@@ -1,6 +1,7 @@
 ﻿using AuthOtpSample.Api.Services;
 using AuthOtpSample.Application.Abstractions.Common;
-using AuthOtpSample.Application.Services;
+using AuthOtpSample.Application.Services.Contracts;
+using AuthOtpSample.Application.Services.Implementations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -23,12 +24,8 @@ public static class ServiceCollectionExtensions
 
 
             var key = config["Jwt:Key"];
-            var issuer = config["Jwt:Issuer"];
-            var audience = config["Jwt:Audience"];
 
-            if (!string.IsNullOrWhiteSpace(key) &&
-                !string.IsNullOrWhiteSpace(issuer) &&
-                !string.IsNullOrWhiteSpace(audience))
+            if (!string.IsNullOrWhiteSpace(key))
             {
                 var keyBytes = Encoding.UTF8.GetBytes(key);
 
@@ -37,12 +34,8 @@ public static class ServiceCollectionExtensions
                     {
                         opt.TokenValidationParameters = new TokenValidationParameters
                         {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
                             ValidateLifetime = true,
                             ValidateIssuerSigningKey = true,
-                            ValidIssuer = issuer,
-                            ValidAudience = audience,
                             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
                         };
                     });

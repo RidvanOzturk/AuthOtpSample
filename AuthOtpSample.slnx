@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="AuthOtpSample.Api/AuthOtpSample.Api.csproj" />
+  <Project Path="AuthOtpSample.Application.Tests/AuthOtpSample.Application.Tests.csproj" Id="8c644908-a96e-473d-8c3a-d0be2904362d" />
   <Project Path="AuthOtpSample.Application/AuthOtpSample.Application.csproj" Id="e7459bdb-7088-4bbd-a4b5-385253b624f5" />
   <Project Path="AuthOtpSample.Domain/AuthOtpSample.Domain.csproj" Id="00a6cd83-d0c9-4831-b0cc-ccc9886d731f" />
   <Project Path="AuthOtpSample.Infrastructure/AuthOtpSample.Infrastructure.csproj" Id="dad255e6-ea44-436f-a9ce-f89a717fb420" />

@@ -1,6 +1,6 @@
-﻿using AuthOtpSample.Api.Contracts.Profile;
-using AuthOtpSample.Application.Features.Profile;
-using AuthOtpSample.Application.Services;
+﻿using AuthOtpSample.Api.Models.Request;
+using AuthOtpSample.Application.DTOs;
+using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +22,7 @@ public class ProfileController(IProfileService profile) : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Upsert([FromBody] UpdateProfileRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateProfileCommand(request.FirstName, request.LastName, request.DateOfBirth);
+        var cmd = new UpdateProfileDto(request.Name, request.Surname, request.DateOfBirth);
         await profile.UpdateAsync(cmd, cancellationToken);
         return Ok();
     }

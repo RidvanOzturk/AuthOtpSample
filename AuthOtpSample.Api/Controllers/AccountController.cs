@@ -1,54 +1,88 @@
-﻿using AuthOtpSample.Api.Contracts.Account;
-using AuthOtpSample.Application.Features.Account.ConfirmOtp;
-using AuthOtpSample.Application.Features.Account.ConfirmPasswordOtp;
-using AuthOtpSample.Application.Features.Account.ForgotPassword;
-using AuthOtpSample.Application.Features.Account.Register;
-using AuthOtpSample.Application.Services;
+﻿using AuthOtpSample.Api.Models.Request;
+using AuthOtpSample.Application.Abstractions.Common;
+using AuthOtpSample.Application.Abstractions.Persistence;
+using AuthOtpSample.Application.DTOs;
+using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Api.Controllers;
 
 [ApiController]
-[Route("Account")]
-public class AccountController(IAccountService accountService) : ControllerBase
+[Route("api/[controller]")]
+public class AccountController(IAccountService accountService, IAppDbContext appDbContext) : ControllerBase
 {
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
-        await accountService.RegisterAsync(new RegisterCommand(request.Email, request.Password), cancellationToken);
+        var exists = await appDbContext.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+        if (exists)
+        {
+            return Conflict();
+        }
+        await accountService.RegisterAsync(new RegisterDto(request.Email, request.Password), cancellationToken);
         return Ok();
     }
 
     [HttpPost("Confirm-otp")]
     public async Task<IActionResult> ConfirmOtp([FromBody] ConfirmOtpRequest request, CancellationToken cancellationToken)
     {
-        await accountService.ConfirmOtpAsync(new ConfirmOtpCommand(request.Email, request.Otp), cancellationToken);
+        var user = await appDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        await accountService.ConfirmOtpAsync(new ConfirmOtpDto(request.Email, request.Otp), cancellationToken);
         return Ok();
     }
 
     [HttpPost("Forgot-Password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
     {
-        await accountService.ForgotPasswordAsync(new ForgotPasswordCommand(request.Email), cancellationToken);
+        await accountService.ForgotPasswordAsync(new ForgotPasswordDto(request.Email), cancellationToken);
         return Ok();
     }
 
     [HttpPost("Confirm-Password-otp")]
     public async Task<IActionResult> ConfirmPasswordOtp([FromBody] ConfirmPasswordOtpRequest request, CancellationToken cancellationToken)
     {
+        var user = await appDbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
+
+        if (user is null)
+        {
+            return NotFound();
+        }
+
         await accountService.ConfirmPasswordOtpAsync(
-            new ConfirmPasswordOtpCommand(request.Email, request.Otp, request.NewPassword),
+            new ConfirmPasswordOtpDto(request.Email, request.Otp, request.NewPassword),
             cancellationToken);
 
         return Ok();
     }
 
     [Authorize]
-    [HttpDelete("Delete/{id:int}")]
-    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    [HttpDelete("Delete")]
+    public async Task<IActionResult> Delete([FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        await accountService.DeleteAccountAsync(id, cancellationToken);
+        var userId = currentUser.UserId ?? throw new UnauthorizedAccessException();
+
+        var exists = await appDbContext.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == userId, cancellationToken);
+
+        if (!exists)
+        {
+            return NotFound();
+        }
+
+        await accountService.DeleteAccountAsync(userId, cancellationToken);
         return Ok();
     }
 }

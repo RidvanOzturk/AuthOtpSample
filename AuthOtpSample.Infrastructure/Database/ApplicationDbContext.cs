@@ -6,54 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Infrastructure.Database;
 
-public sealed class ApplicationDbContext : DbContext, IAppDbContext
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser) : DbContext(options), IAppDbContext
 {
-    private readonly ICurrentUser _currentUser;
-
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser)
-        : base(options)
-    {
-        _currentUser = currentUser;
-    }
-
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Otp> Otps => Set<Otp>();
-    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<User> Users { get; set; }
+    public DbSet<Otp> Otps { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>(b =>
-        {
-            b.HasQueryFilter(x => !x.IsDeleted);
-
-            b.Property(x => x.Email).HasMaxLength(256).IsRequired();
-            b.HasIndex(x => x.Email).IsUnique().HasFilter("[IsDeleted] = 0");
-
-            b.Property(x => x.DateOfBirth)
-             .HasConversion(
-                 v => v.HasValue ? v.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
-                 v => v.HasValue ? DateOnly.FromDateTime(v.Value) : (DateOnly?)null)
-             .HasColumnType("date");
-
-            b.HasOne(x => x.Notification)
-             .WithOne(x => x.User)
-             .HasForeignKey<Notification>(x => x.UserId);
-        });
-
-        modelBuilder.Entity<Notification>(b =>
-        {
-            b.HasQueryFilter(x => !x.IsDeleted);
-            b.HasIndex(x => x.UserId).IsUnique().HasFilter("[IsDeleted] = 0");
-        });
-
-        modelBuilder.Entity<Otp>(b =>
-        {
-            b.HasQueryFilter(x => !x.IsDeleted);
-            b.Property(x => x.Code).HasMaxLength(16).IsRequired();
-            b.HasIndex(x => new { x.UserId, x.Type, x.ExpirationDate });
-        });
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
     public override int SaveChanges()
@@ -71,27 +34,27 @@ public sealed class ApplicationDbContext : DbContext, IAppDbContext
     private void ApplyAuditAndSoftDelete()
     {
         var now = DateTime.UtcNow;
-        var actor = string.IsNullOrWhiteSpace(_currentUser.UserId.ToString()) ? "system" : _currentUser.UserId.ToString();
+        var createdBy = currentUser.UserId.HasValue
+            ? currentUser.UserId.Value.ToString()
+            : "system";
 
         foreach (var entry in ChangeTracker.Entries<AbstractAuditEntity>())
         {
-            if (entry.State == EntityState.Modified)
-            {
-                Entry(entry.Entity).Property(x => x.CreatedAt).IsModified = false;
-                Entry(entry.Entity).Property(x => x.CreatedBy).IsModified = false;
-            }
-
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.IsDeleted = false;
                 entry.Entity.CreatedAt = now;
-                entry.Entity.CreatedBy = actor;
+                entry.Entity.CreatedBy = createdBy;
             }
 
             if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = now;
-                entry.Entity.UpdatedBy = actor;
+                entry.Entity.UpdatedBy = createdBy;
+                Entry(entry.Entity).Property(x => x.CreatedAt).IsModified = false;
+                Entry(entry.Entity).Property(x => x.CreatedBy).IsModified = false;
+                Entry(entry.Entity).Property(x => x.DeletedAt).IsModified = false;
+                Entry(entry.Entity).Property(x => x.DeletedBy).IsModified = false;
+                Entry(entry.Entity).Property(x => x.IsDeleted).IsModified = false;
             }
 
             if (entry.State == EntityState.Deleted)
@@ -99,13 +62,11 @@ public sealed class ApplicationDbContext : DbContext, IAppDbContext
                 entry.State = EntityState.Modified;
                 entry.Entity.IsDeleted = true;
                 entry.Entity.DeletedAt = now;
-                entry.Entity.DeletedBy = actor;
-            }
-
-            if (entry.State == EntityState.Modified && entry.Entity.IsDeleted && entry.Entity.DeletedAt is null)
-            {
-                entry.Entity.DeletedAt = now;
-                entry.Entity.DeletedBy = actor;
+                entry.Entity.DeletedBy = createdBy;
+                Entry(entry.Entity).Property(x => x.UpdatedAt).IsModified = false;
+                Entry(entry.Entity).Property(x => x.UpdatedBy).IsModified = false;
+                Entry(entry.Entity).Property(x => x.CreatedAt).IsModified = false;
+                Entry(entry.Entity).Property(x => x.CreatedBy).IsModified = false;
             }
         }
     }
