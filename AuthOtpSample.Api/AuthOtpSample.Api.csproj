@@ -74,8 +74,4 @@
     <ProjectReference Include="..\AuthOtpSample.Infrastructure\AuthOtpSample.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Middleware\" />
-  </ItemGroup>
-
 </Project>

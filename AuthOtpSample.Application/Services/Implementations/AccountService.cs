@@ -69,9 +69,9 @@ public class AccountService(
         await appDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task ForgotPasswordAsync(ForgotPasswordDto command, CancellationToken cancellationToken)
+    public async Task ForgotPasswordAsync(ForgotPasswordDto requestDto, CancellationToken cancellationToken)
     {
-        var user = await appDbContext.Users.FirstOrDefaultAsync(x => x.Email == command.Email, cancellationToken);
+        var user = await appDbContext.Users.FirstOrDefaultAsync(x => x.Email == requestDto.Email, cancellationToken);
         if (user is null)
         {
             return;
@@ -115,14 +115,14 @@ public class AccountService(
         }
     }
 
-    public async Task ConfirmPasswordOtpAsync(ConfirmPasswordOtpDto command, CancellationToken cancellationToken)
+    public async Task ConfirmPasswordOtpAsync(ConfirmPasswordOtpDto requestDto, CancellationToken cancellationToken)
     {
-        var user = await appDbContext.Users.FirstAsync(x => x.Email == command.Email, cancellationToken);
+        var user = await appDbContext.Users.FirstAsync(x => x.Email == requestDto.Email, cancellationToken);
 
         var otp = await appDbContext.Otps.FirstOrDefaultAsync(x =>
             x.UserId == user.Id &&
             x.Type == OtpType.ForgotPassword &&
-            x.Code == command.Otp &&
+            x.Code == requestDto.Otp &&
             x.ExpirationDate > DateTime.UtcNow, cancellationToken);
 
         if (otp is null)
@@ -130,7 +130,7 @@ public class AccountService(
             throw new InvalidOperationException("Invalid otp");
         }
 
-        user.HashPassword = hasher.Hash(command.NewPassword);
+        user.HashPassword = hasher.Hash(requestDto.NewPassword);
         appDbContext.Otps.Remove(otp);
 
         await appDbContext.SaveChangesAsync(cancellationToken);

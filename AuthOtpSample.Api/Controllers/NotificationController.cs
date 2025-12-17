@@ -21,22 +21,22 @@ public class NotificationController(INotificationService notifications) : Contro
     [HttpPost("users")]
     public async Task<IActionResult> CreateForCurrentUser([FromBody] NotificationRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateNotificationDto(
+        var notificationDto = new UpdateNotificationDto(
             request.IsEmailNotificationEnabled,
             request.IsSmsNotificationEnabled);
 
-        await notifications.UpsertAsync(cmd, cancellationToken);
+        await notifications.UpsertAsync(notificationDto, cancellationToken);
         return Ok();
     }
 
     [HttpPut("users")]
     public async Task<IActionResult> UpdateForCurrentUser([FromBody] NotificationRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateNotificationDto(
+        var updateNotification = new UpdateNotificationDto(
             request.IsEmailNotificationEnabled,
             request.IsSmsNotificationEnabled);
 
-        await notifications.UpsertAsync(cmd, cancellationToken);
+        await notifications.UpsertAsync(updateNotification, cancellationToken);
         return Ok();
     }
 

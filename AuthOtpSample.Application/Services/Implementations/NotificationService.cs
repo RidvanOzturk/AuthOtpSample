@@ -30,7 +30,7 @@ public class NotificationService(IAppDbContext appDbContext, ICurrentUser curren
         return new NotificationDto(entity.IsEmailNotificationEnabled, entity.IsSmsNotificationEnabled);
     }
 
-    public async Task UpsertAsync(UpdateNotificationDto command, CancellationToken cancellationToken)
+    public async Task UpsertAsync(UpdateNotificationDto updateNotification, CancellationToken cancellationToken)
     {
         var userId = GetUserIdOrThrow();
 
@@ -42,15 +42,15 @@ public class NotificationService(IAppDbContext appDbContext, ICurrentUser curren
             entity = new Notification
             {
                 UserId = userId,
-                IsEmailNotificationEnabled = command.IsEmailNotificationEnabled,
-                IsSmsNotificationEnabled = command.IsSmsNotificationEnabled
+                IsEmailNotificationEnabled = updateNotification.IsEmailNotificationEnabled,
+                IsSmsNotificationEnabled = updateNotification.IsSmsNotificationEnabled
             };
             appDbContext.Notifications.Add(entity);
         }
         else
         {
-            entity.IsEmailNotificationEnabled = command.IsEmailNotificationEnabled;
-            entity.IsSmsNotificationEnabled = command.IsSmsNotificationEnabled;
+            entity.IsEmailNotificationEnabled = updateNotification.IsEmailNotificationEnabled;
+            entity.IsSmsNotificationEnabled = updateNotification.IsSmsNotificationEnabled;
         }
 
         await appDbContext.SaveChangesAsync(cancellationToken);

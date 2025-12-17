@@ -4,9 +4,9 @@ namespace AuthOtpSample.Application.Services.Contracts;
 
 public interface IAccountService
 {
-    Task RegisterAsync(RegisterDto command, CancellationToken cancellationToken);
-    Task ConfirmOtpAsync(ConfirmOtpDto command, CancellationToken cancellationToken);
-    Task ForgotPasswordAsync(ForgotPasswordDto command, CancellationToken cancellationToken);
-    Task ConfirmPasswordOtpAsync(ConfirmPasswordOtpDto command, CancellationToken cancellationToken);
+    Task RegisterAsync(RegisterDto request, CancellationToken cancellationToken);
+    Task ConfirmOtpAsync(ConfirmOtpDto request, CancellationToken cancellationToken);
+    Task ForgotPasswordAsync(ForgotPasswordDto request, CancellationToken cancellationToken);
+    Task ConfirmPasswordOtpAsync(ConfirmPasswordOtpDto request, CancellationToken cancellationToken);
     Task DeleteAccountAsync(int userId, CancellationToken cancellationToken);
 }

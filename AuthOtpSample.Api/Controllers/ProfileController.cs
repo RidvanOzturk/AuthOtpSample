@@ -18,12 +18,11 @@ public class ProfileController(IProfileService profile) : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
     [HttpPut]
     public async Task<IActionResult> Upsert([FromBody] UpdateProfileRequest request, CancellationToken cancellationToken)
     {
-        var cmd = new UpdateProfileDto(request.Name, request.Surname, request.DateOfBirth);
-        await profile.UpdateAsync(cmd, cancellationToken);
+        var updateProfile = new UpdateProfileDto(request.Name, request.Surname, request.DateOfBirth);
+        await profile.UpdateAsync(updateProfile, cancellationToken);
         return Ok();
     }
 

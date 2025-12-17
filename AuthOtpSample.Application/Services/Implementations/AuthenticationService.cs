@@ -9,11 +9,11 @@ namespace AuthOtpSample.Application.Services.Implementations;
 public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher hasher, ITokenService tokens)
     : IAuthenticationService
 {
-    public async Task<string> LoginAsync(LoginDto command, CancellationToken cancellationToken)
+    public async Task<string> LoginAsync(LoginDto request, CancellationToken cancellationToken)
     {
         var user = await appDbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email == command.Email, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken);
 
         if (user is null)
         {
@@ -25,7 +25,7 @@ public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher h
             throw new UnauthorizedAccessException("Account is not active");
         }
 
-        if (!hasher.Verify(command.Password, user.HashPassword))
+        if (!hasher.Verify(request.Password, user.HashPassword))
         {
             throw new UnauthorizedAccessException("Invalid credentials");
         }

@@ -25,7 +25,7 @@ public class ProfileService(IAppDbContext appDbContext, ICurrentUser currentUser
         return result;
     }
 
-    public async Task UpdateAsync(UpdateProfileDto command, CancellationToken cancellationToken)
+    public async Task UpdateAsync(UpdateProfileDto request, CancellationToken cancellationToken)
     {
         var userId = GetUserIdOrThrow();
 
@@ -35,9 +35,9 @@ public class ProfileService(IAppDbContext appDbContext, ICurrentUser currentUser
             throw new InvalidOperationException("User not found");
         }
 
-        user.Name = command.Name;
-        user.Surname = command.Surname;
-        user.DateOfBirth = command.DateOfBirth;
+        user.Name = request.Name;
+        user.Surname = request.Surname;
+        user.DateOfBirth = request.DateOfBirth;
 
         await appDbContext.SaveChangesAsync(cancellationToken);
     }

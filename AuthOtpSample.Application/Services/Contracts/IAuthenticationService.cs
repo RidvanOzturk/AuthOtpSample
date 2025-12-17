@@ -4,5 +4,5 @@ namespace AuthOtpSample.Application.Services.Contracts;
 
 public interface IAuthenticationService
 {
-    Task<string> LoginAsync(LoginDto command, CancellationToken cancellationToken);
+    Task<string> LoginAsync(LoginDto request, CancellationToken cancellationToken);
 }

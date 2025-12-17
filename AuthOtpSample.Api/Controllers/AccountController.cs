@@ -5,6 +5,7 @@ using AuthOtpSample.Application.DTOs;
 using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Api.Controllers;
@@ -14,6 +15,7 @@ namespace AuthOtpSample.Api.Controllers;
 public class AccountController(IAccountService accountService, IAppDbContext appDbContext) : ControllerBase
 {
     [HttpPost("Register")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var exists = await appDbContext.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
@@ -26,6 +28,7 @@ public class AccountController(IAccountService accountService, IAppDbContext app
     }
 
     [HttpPost("Confirm-otp")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> ConfirmOtp([FromBody] ConfirmOtpRequest request, CancellationToken cancellationToken)
     {
         var user = await appDbContext.Users
@@ -42,6 +45,7 @@ public class AccountController(IAccountService accountService, IAppDbContext app
     }
 
     [HttpPost("Forgot-Password")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
     {
         await accountService.ForgotPasswordAsync(new ForgotPasswordDto(request.Email), cancellationToken);
@@ -49,6 +53,7 @@ public class AccountController(IAccountService accountService, IAppDbContext app
     }
 
     [HttpPost("Confirm-Password-otp")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> ConfirmPasswordOtp([FromBody] ConfirmPasswordOtpRequest request, CancellationToken cancellationToken)
     {
         var user = await appDbContext.Users

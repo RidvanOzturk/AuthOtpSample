@@ -4,6 +4,7 @@ using AuthOtpSample.Application.Abstractions.Persistence;
 using AuthOtpSample.Application.DTOs;
 using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Api.Controllers;
@@ -13,6 +14,7 @@ namespace AuthOtpSample.Api.Controllers;
 public class AuthenticationController(IAuthenticationService authenticationService, IAppDbContext appDbContext) : ControllerBase
 {
     [HttpPost("login")]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var user = await appDbContext.Users
