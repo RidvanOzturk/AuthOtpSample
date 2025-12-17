@@ -9,9 +9,9 @@ using MimeKit.Text;
 
 namespace AuthOtpSample.Infrastructure.Services;
 
-public sealed class EmailSender(
+public sealed class EmailSenderService(
     IOptions<SmtpOptions> options,
-    ILogger<EmailSender> logger
+    ILogger<EmailSenderService> logger
 ) : IEmailSender
 {
     private readonly SmtpOptions _options = options.Value;

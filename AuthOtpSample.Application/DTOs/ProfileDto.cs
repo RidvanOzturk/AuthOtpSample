@@ -1,3 +1,3 @@
 ﻿namespace AuthOtpSample.Application.DTOs;
 
-public record ProfileDto(string? FirstName, string? LastName, DateOnly? DateOfBirth);
+public record ProfileDto(string? Name, string? Surname, DateOnly? DateOfBirth);

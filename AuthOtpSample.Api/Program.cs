@@ -26,4 +26,4 @@ app.UseAuthorization();
 
 app.MapControllers().RequireRateLimiting("api");
 
-app.Run();
+await app.RunAsync();

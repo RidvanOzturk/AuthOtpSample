@@ -2,7 +2,7 @@
 
 namespace AuthOtpSample.Infrastructure.Services;
 
-public class SmsSender : ISmsSender
+public class SmsSenderService : ISmsSender
 {
     public Task SendAsync(int userId, string message, CancellationToken cancellationToken)
     {

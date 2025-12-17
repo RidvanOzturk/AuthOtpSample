@@ -1,12 +1,12 @@
 using AuthOtpSample.Application.Abstractions.Persistence;
-using AuthOtpSample.Application.Abstractions.Security;
+using AuthOtpSample.Application.Abstractions.Token;
 using AuthOtpSample.Application.DTOs;
 using AuthOtpSample.Application.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuthOtpSample.Application.Services.Implementations;
 
-public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher hasher, ITokenService tokens)
+public class AuthenticationService(IAppDbContext appDbContext, ITokenService tokens)
     : IAuthenticationService
 {
     public async Task<string> LoginAsync(LoginDto request, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ public class AuthenticationService(IAppDbContext appDbContext, IPasswordHasher h
             throw new UnauthorizedAccessException("Account is not active");
         }
 
-        if (!hasher.Verify(request.Password, user.HashPassword))
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.HashPassword))
         {
             throw new UnauthorizedAccessException("Invalid credentials");
         }

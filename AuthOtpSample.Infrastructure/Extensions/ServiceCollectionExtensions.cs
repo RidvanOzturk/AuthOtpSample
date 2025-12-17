@@ -1,5 +1,6 @@
 ﻿using AuthOtpSample.Application.Abstractions.Notifications;
-using AuthOtpSample.Application.Abstractions.Security;
+using AuthOtpSample.Application.Abstractions.Persistence;
+using AuthOtpSample.Application.Abstractions.Token;
 using AuthOtpSample.Infrastructure.Database;
 using AuthOtpSample.Infrastructure.Notifications;
 using AuthOtpSample.Infrastructure.Services;
@@ -18,10 +19,15 @@ public static class ServiceCollectionExtensions
             services.AddDbContext<ApplicationDbContext>(opt =>
                 opt.UseSqlServer(config.GetConnectionString("SqlServer")));
 
+            services.AddScoped<IAppDbContext>(sp =>
+            sp.GetRequiredService<ApplicationDbContext>());
+
             services.AddScoped<ITokenService, JwtTokenService>();
             services.Configure<SmtpOptions>(config.GetSection("Smtp"));
-            services.AddScoped<IEmailSender, EmailSender>();
-            services.AddScoped<ISmsSender, SmsSender>();
+            services.AddScoped<IEmailSender, EmailSenderService>();
+            services.AddScoped<ISmsSender, SmsSenderService>();
+
+            services.AddHostedService<NotificationBackgroundService>();
 
             return services;
         }

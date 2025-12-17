@@ -1,6 +1,5 @@
 ﻿using AuthOtpSample.Application.Abstractions.Notifications;
 using AuthOtpSample.Application.Abstractions.Persistence;
-using AuthOtpSample.Application.Abstractions.Security;
 using AuthOtpSample.Application.DTOs;
 using AuthOtpSample.Application.Services.Contracts;
 using AuthOtpSample.Domain.Entities;
@@ -11,7 +10,6 @@ namespace AuthOtpSample.Application.Services.Implementations;
 
 public class AccountService(
     IAppDbContext appDbContext,
-    IPasswordHasher hasher,
     IEmailSender emailSender,
     ISmsSender smsSender
 ) : IAccountService
@@ -21,7 +19,7 @@ public class AccountService(
         var user = new User
         {
             Email = request.Email,
-            HashPassword = hasher.Hash(request.Password),
+            HashPassword = BCrypt.Net.BCrypt.HashPassword(request.Password),
             IsActive = false
         };
 
@@ -130,7 +128,7 @@ public class AccountService(
             throw new InvalidOperationException("Invalid otp");
         }
 
-        user.HashPassword = hasher.Hash(requestDto.NewPassword);
+        user.HashPassword = BCrypt.Net.BCrypt.HashPassword(requestDto.NewPassword);
         appDbContext.Otps.Remove(otp);
 
         await appDbContext.SaveChangesAsync(cancellationToken);

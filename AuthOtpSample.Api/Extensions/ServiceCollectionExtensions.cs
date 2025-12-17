@@ -2,12 +2,11 @@
 using AuthOtpSample.Application.Abstractions.Common;
 using AuthOtpSample.Application.Services.Contracts;
 using AuthOtpSample.Application.Services.Implementations;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.RateLimiting;
-// diğer using’ler...
 
 namespace AuthOtpSample.Api.Extensions;
 
@@ -18,6 +17,8 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddServices(IConfiguration config)
         {
             services.AddHttpContextAccessor();
+
+            services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
 
             services.AddScoped<ICurrentUser, CurrentUserService>();
             services.AddScoped<IAccountService, AccountService>();
@@ -38,10 +39,8 @@ public static class ServiceCollectionExtensions
                         {
                             ValidateIssuerSigningKey = true,
                             IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-
                             ValidateLifetime = true,
                             ClockSkew = TimeSpan.Zero,
-
                             ValidateIssuer = false,
                             ValidateAudience = false
                         };

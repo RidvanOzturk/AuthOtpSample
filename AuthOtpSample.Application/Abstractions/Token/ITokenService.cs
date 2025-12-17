@@ -1,4 +1,4 @@
-﻿namespace AuthOtpSample.Application.Abstractions.Security;
+﻿namespace AuthOtpSample.Application.Abstractions.Token;
 
 public interface ITokenService
 {
