@@ -2,6 +2,11 @@
 
 AuthOtpSample is a minimal sample project that demonstrates email-based OTP (one-time password) authentication using .NET and C#.
 
+## Live Demo
+
+The project is deployed and publicly accessible.
+- Swagger UI: https://furious-kiele-authotpsample-32259a3e.koyeb.app/swagger/index.html
+
 ## Features
 
 - Request OTP via email
