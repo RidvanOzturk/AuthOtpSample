@@ -2,13 +2,18 @@
 
 AuthOtpSample is a minimal sample project that demonstrates email-based OTP (one-time password) authentication using .NET and C#.
 
+## Live Demo
+
+The project is deployed and publicly accessible.
+- Swagger UI: https://furious-kiele-authotpsample-32259a3e.koyeb.app/swagger/index.html
+
 ## Features
 
 - Request OTP via email
 - Confirm OTP for login / account actions
 - Basic API rate limiting
 - FluentValidation-based request validation
-- Layered architecture (`Api`, `Application`, `Domain`, `Infrastructure`)
+- Clean Architecture (`Api`, `Application`, `Domain`, `Infrastructure`)
 - Unit tests for core application logic
 
 ## Technology Stack
@@ -17,7 +22,7 @@ AuthOtpSample is a minimal sample project that demonstrates email-based OTP (one
 - C# 14
 - ASP.NET Core Web API
 - FluentValidation
-- xUnit (or similar) for tests
+- xUnit for tests
 
 ## Getting Started
 
@@ -84,11 +89,11 @@ From there you can:
 
 ## Project Structure
 
-- `AuthOtpSample.Api` – ASP.NET Core Web API layer (controllers, middleware, validators, `Program.cs`)
-- `AuthOtpSample.Application` – Application services, use cases, business logic
-- `AuthOtpSample.Domain` – Domain entities and core domain rules
-- `AuthOtpSample.Infrastructure` – Persistence, email sender implementation, external integrations
-- `AuthOtpSample.Application.Tests` – Unit tests for application layer
+- `AuthOtpSample.Api` â€“ ASP.NET Core Web API layer (controllers, middleware, validators, `Program.cs`)
+- `AuthOtpSample.Application` â€“ Application services, use cases, business logic
+- `AuthOtpSample.Domain` â€“ Domain entities and core domain rules
+- `AuthOtpSample.Infrastructure` â€“ Persistence, email sender implementation, external integrations
+- `AuthOtpSample.Application.Tests` â€“ Unit tests for application layer
 
 ## Running Tests
 
