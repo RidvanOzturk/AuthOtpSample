@@ -11,7 +11,7 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasQueryFilter(x => !x.IsDeleted);
 
         builder.Property(x => x.Email).HasMaxLength(256).IsRequired();
-        builder.HasIndex(x => x.Email).IsUnique().HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(x => x.Email).IsUnique().HasFilter("\"IsDeleted\" = false");
 
         builder.Property(x => x.DateOfBirth)
             .HasConversion(

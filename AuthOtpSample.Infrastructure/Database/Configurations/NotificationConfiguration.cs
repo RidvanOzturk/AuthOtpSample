@@ -9,6 +9,6 @@ public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notific
     public void Configure(EntityTypeBuilder<Notification> builder)
     {
         builder.HasQueryFilter(x => !x.IsDeleted);
-        builder.HasIndex(x => x.UserId).IsUnique().HasFilter("[IsDeleted] = 0");
+        builder.HasIndex(x => x.UserId).IsUnique().HasFilter("\"IsDeleted\" = false");
     }
 }

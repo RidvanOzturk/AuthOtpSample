@@ -1,4 +1,4 @@
-﻿using AuthOtpSample.Application.Abstractions.Notifications;
+using AuthOtpSample.Application.Abstractions.Notifications;
 using AuthOtpSample.Application.Abstractions.Persistence;
 using AuthOtpSample.Application.Abstractions.Token;
 using AuthOtpSample.Infrastructure.Database;
@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddInfrastructure(IConfiguration config)
         {
             services.AddDbContext<ApplicationDbContext>(opt =>
-                opt.UseSqlServer(config.GetConnectionString("SqlServer")));
+                opt.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IAppDbContext>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
