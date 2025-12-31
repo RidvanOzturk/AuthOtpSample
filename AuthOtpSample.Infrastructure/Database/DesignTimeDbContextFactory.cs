@@ -18,11 +18,18 @@ public class DesignTimeDbContextFactory
             .AddEnvironmentVariables()
             .Build();
 
+        var connectionString =
+            configuration.GetConnectionString("DefaultConnection");
+
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+
         optionsBuilder.UseNpgsql(
-            configuration.GetConnectionString("DefaultConnection"));
+            connectionString,
+            npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(0);
+            });
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }
 }
-
